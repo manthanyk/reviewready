@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { parsePrDescriptionContent } from "./routers";
+import { appRouter, parsePrDescriptionContent } from "./routers";
+import type { TrpcContext } from "./_core/context";
 
 describe("parsePrDescriptionContent", () => {
   it("accepts a response with exactly the four required sections", () => {
@@ -39,6 +40,20 @@ describe("parsePrDescriptionContent", () => {
       summary: "The helper now validates parameters at compile time.",
       changes: ["src/math.ts: Adds number types to both parameters"],
       testingNotes: "Existing math tests should continue to pass.",
+    });
+  });
+});
+
+describe("reviewReady.generatePrDescription", () => {
+  it("rejects a diff that is too short before it reaches an AI provider", async () => {
+    const caller = appRouter.createCaller({
+      user: null,
+      req: {} as TrpcContext["req"],
+      res: {} as TrpcContext["res"],
+    });
+
+    await expect(caller.reviewReady.generatePrDescription({ diff: "short" })).rejects.toMatchObject({
+      code: "BAD_REQUEST",
     });
   });
 });
