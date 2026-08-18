@@ -44,12 +44,15 @@ export function parsePrDescriptionContent(content: string): PrDescription {
   const changes = extractedChanges.length > 0
     ? extractedChanges
     : [asText(record.summary) ?? asText(record.description)].filter((value): value is string => Boolean(value));
+  const summary = asText(record.summary) ?? asText(record.description) ?? asText(record.impact);
+  const title = asText(record.title) ?? asText(record.description) ?? summary ?? changes[0];
+  const testingNotes = asText(record.testingNotes) ?? asText(record.tests) ?? asText(record.testing) ?? asText(record.impact) ?? "The AI did not provide explicit testing notes for this diff.";
 
   return prDescriptionSchema.parse({
-    title: asText(record.title) ?? asText(record.description),
-    summary: asText(record.summary) ?? asText(record.description),
+    title,
+    summary,
     changes,
-    testingNotes: asText(record.testingNotes) ?? asText(record.tests) ?? asText(record.testing),
+    testingNotes,
   });
 }
 

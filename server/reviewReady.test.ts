@@ -19,12 +19,14 @@ describe("parsePrDescriptionContent", () => {
     });
   });
 
-  it("rejects a response missing testing notes", () => {
-    expect(() => parsePrDescriptionContent(JSON.stringify({
+  it("fills an explicit fallback when testing notes are omitted", () => {
+    expect(parsePrDescriptionContent(JSON.stringify({
       title: "feat: add pull request description generator",
       summary: "Turns a pasted git diff into a review-ready PR description.",
       changes: ["Adds a server-side generation procedure"],
-    }))).toThrow();
+    }))).toMatchObject({
+      testingNotes: "The AI did not provide explicit testing notes for this diff.",
+    });
   });
 
   it("normalizes common free-model aliases into the four required sections", () => {
@@ -40,6 +42,20 @@ describe("parsePrDescriptionContent", () => {
       summary: "The helper now validates parameters at compile time.",
       changes: ["src/math.ts: Adds number types to both parameters"],
       testingNotes: "Existing math tests should continue to pass.",
+    });
+  });
+
+  it("derives required fields when a free model returns only summary-style content", () => {
+    const result = parsePrDescriptionContent(JSON.stringify({
+      summary: "Changes name formatting to title case.",
+      changes: ["Trims and capitalizes each word."],
+    }));
+
+    expect(result).toEqual({
+      title: "Changes name formatting to title case.",
+      summary: "Changes name formatting to title case.",
+      changes: ["Trims and capitalizes each word."],
+      testingNotes: "The AI did not provide explicit testing notes for this diff.",
     });
   });
 });

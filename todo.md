@@ -18,3 +18,5 @@
 - [x] Set repository visibility to public and verify the PR is readable without authentication.
 - [x] Provide a camera-on recording guide for the user’s genuine assignment explanation.
 - [ ] Upload the user-provided genuine camera-on recording to Google Drive and set “Anyone with the link” viewing access.
+- [ ] Connect the user browser, capture a genuine camera-on live ReviewReady walkthrough, and save the recording for Drive upload.
+- [x] Harden free-model response normalization for valid outputs that omit a title or testing notes.
